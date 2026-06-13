@@ -1,5 +1,8 @@
 package main
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Resep struct{
 	title string
@@ -32,6 +35,8 @@ func tambah(data []Resep) []Resep {
 	fmt.Println("===================")
 	fmt.Println("  TAMBAHKAN RESEP  ")
 	fmt.Println("===================")
+	fmt.Println("Pastikan untuk menggunakan '_' sebagai pengganti Spasi!!!")
+	fmt.Println()
 
 	fmt.Print("Masukkan Judul : ")
 	fmt.Scan(&r.title)
@@ -62,7 +67,9 @@ func tambah(data []Resep) []Resep {
 
 	data = append(data, r)
 
+	fmt.Println("----------------------------")
 	fmt.Println("Resep berhasil ditambahkan!")
+	fmt.Println("----------------------------")
 
 	return data
 }
@@ -70,6 +77,7 @@ func tambah(data []Resep) []Resep {
 
 func lihat(data []Resep){
 	var pilih int
+	var confirm string
 
 	fmt.Println("=================")
 	fmt.Println("   SEMUA RESEP   ")
@@ -87,8 +95,12 @@ func lihat(data []Resep){
 	}
 
 	fmt.Println("=================")
-	fmt.Print("Pilih Resep(1-", len(data), ") : ")
+	fmt.Print("Pilih Resep(1-", len(data), ") atau ketik '0' untuk kembali : ")
 	fmt.Scan(&pilih)
+
+	if pilih == 0 {
+		return
+	}
 
 	if pilih < 1 || pilih > len(data) {
 		fmt.Println("Nomor resep tidak valid!")
@@ -96,7 +108,9 @@ func lihat(data []Resep){
 	}
 
 	fmt.Println("#####################")
-	fmt.Println("    ",data[pilih-1].title ,"        ")
+	fmt.Print("    ",)
+	tampilkanTeks(data[pilih-1].title)
+	fmt.Println("        ")
 	fmt.Println("#####################")
 	fmt.Println("Bahan : ")
 	for i := 0; i < data[pilih-1].nBahan; i++{
@@ -118,6 +132,16 @@ func lihat(data []Resep){
 	fmt.Println()
 
 	fmt.Printf("Durasi : %d menit\n", data[pilih-1].duration)
+
+	fmt.Println()
+	fmt.Println("----------------------------")
+	fmt.Print("Ketik 'back' untuk kembali :")
+	fmt.Scan(&confirm)
+	confirm = strings.ToUpper(confirm)
+	fmt.Println("----------------------------")
+	if confirm == "BACK" {
+		lihat(data)
+	}
 
 }
 
@@ -142,8 +166,12 @@ func ubah(data []Resep) []Resep{
 	}
 
 	fmt.Println("=================")
-	fmt.Print("Pilih Resep yang Ingin Diubah(1-", len(data), ") : ")
+	fmt.Print("Pilih Resep yang Ingin Diubah(1-", len(data), ") atau pilih '0' untuk kembali : ")
 	fmt.Scan(&pilih)
+
+	if pilih == 0{
+		return data
+	}
 
 	if pilih < 1 || pilih > len(data) {
 		fmt.Println("Nomor resep tidak valid!")
@@ -152,7 +180,9 @@ func ubah(data []Resep) []Resep{
 
 
 	fmt.Println("#####################")
-	fmt.Println("    ",data[pilih-1].title ,"        ")
+	fmt.Print("    ")
+	tampilkanTeks(data[pilih-1].title)
+	fmt.Println("        ")
 	fmt.Println("#####################")
 	fmt.Print("Apakah Kamu Ingin Mengubah Judul(y/n) : ")
 	fmt.Scan(&confirm)
@@ -171,13 +201,26 @@ func ubah(data []Resep) []Resep{
 			tampilkanTeks(data[pilih-1].bahan[i])
 			fmt.Println()
 			}
-			fmt.Print("Bahan Nomor Berapa yang Ingin Diubah(1-", data[pilih-1].bahan, ") : ")
+			fmt.Print("Bahan Nomor Berapa yang Ingin Diubah(1-", data[pilih-1].nBahan, ") atau Ketik '0' untuk Menambah Bahan : ")
 			fmt.Scan(&memilih)
 			fmt.Println("-------------------------")
-			fmt.Print("Ubah ", data[pilih-1].bahan[memilih-1], " Jadi : ")
-			fmt.Scan(&data[pilih-1].bahan[memilih-1])
-			fmt.Print("Masih Ingin Ubah Bahan(y/n) : ")
-			fmt.Scan(&confirm)
+
+			if memilih == 0 {
+				...
+
+
+			}else if != 0 {
+				if memilih < 1 || memilih > data[pilih-1].nBahan {
+				fmt.Println("Nomor bahan tidak valid!")
+				continue
+				}
+
+				fmt.Print("Ubah ", data[pilih-1].bahan[memilih-1], " Jadi : ")
+				fmt.Scan(&data[pilih-1].bahan[memilih-1])
+				fmt.Print("Masih Ingin Ubah Bahan(y/n) : ")
+				fmt.Scan(&confirm)
+			}
+
 			if confirm == "n" || confirm == "N"{
 				break
 			}
@@ -195,14 +238,14 @@ func ubah(data []Resep) []Resep{
 				tampilkanTeks(data[pilih-1].steps[i])
 				fmt.Println()
 			}
-			fmt.Print("Steps Nomor Berapa yang Ingin Diubah(1-", data[pilih-1].steps, ") : ")
+			fmt.Print("Steps Nomor Berapa yang Ingin Diubah(1-", data[pilih-1].nSteps, ") : ")
 			fmt.Scan(&memilih)
 			fmt.Println("-------------------------")
 			fmt.Print("Ubah ", data[pilih-1].steps[memilih-1], " Jadi : ")
 			fmt.Scan(&data[pilih-1].steps[memilih-1])
 			fmt.Print("Masih Ingin Ubah Steps(y/n) : ")
 			fmt.Scan(&confirm)
-			if confirm == "n" || confirm == "n"{
+			if confirm == "n" || confirm == "N"{
 				break
 			}
 		}
