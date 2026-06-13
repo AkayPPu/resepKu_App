@@ -274,7 +274,7 @@ func lihat(data []Resep) {
 	fmt.Print("Ketik 'back' untuk kembali : ")
 	fmt.Scan(&confirm)
 	fmt.Println("----------------------------")
-	if confirm == "back" || confirm == "BACK" || confirm == "Back" {
+	if confirm == "back" || confirm == "BACK" || confirm == "Back" || confirm == "BAck" || confirm == "BaCK" || confirm == "bACk" || confirm == "bacK" || confirm == "baCk" {
 		lihat(data)
 	}
 
