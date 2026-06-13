@@ -1,20 +1,18 @@
 package main
-import (
-	"fmt"
-	"strings"
-)
 
-type Resep struct{
+import "fmt"
+
+type Resep struct {
 	title string
 
 	nBahan int
-	bahan [50]string
-	
-	nSteps int
-	steps [50]string
+	bahan  [50]string
 
-	kategori string
-	duration int
+	nSteps int
+	steps  [50]string
+
+	kategori    string
+	duration    int
 	searchCount int
 }
 
@@ -27,7 +25,6 @@ func tampilkanTeks(teks string) {
 		}
 	}
 }
-
 
 func tambah(data []Resep) []Resep {
 	var r Resep
@@ -74,8 +71,7 @@ func tambah(data []Resep) []Resep {
 	return data
 }
 
-
-func lihat(data []Resep){
+func lihat(data []Resep) {
 	var pilih int
 	var confirm string
 
@@ -85,21 +81,161 @@ func lihat(data []Resep){
 
 	if len(data) == 0 {
 		fmt.Println("Belum ada resep.")
+		fmt.Println("=================")
+		fmt.Println("Ketik '-2' untuk kembali ke Menu Utama")
+		fmt.Print("Pilihan Anda : ")
+		fmt.Scan(&pilih)
+		if pilih == -2 {
+			return
+		}
+		fmt.Println("Pilihan tidak valid!")
+		lihat(data)
 		return
 	}
 
 	for i := 0; i < len(data); i++ {
 		fmt.Print(i+1, ". ")
 		tampilkanTeks(data[i].title)
+		fmt.Printf(" | Durasi: %d menit", data[i].duration)
 		fmt.Println()
 	}
 
 	fmt.Println("=================")
-	fmt.Print("Pilih Resep(1-", len(data), ") atau ketik '0' untuk kembali : ")
+	fmt.Println("Pilih nomor resep (1-", len(data), ") untuk melihat detail")
+	fmt.Println("Ketik '0'  -> Cari Resep")
+	fmt.Println("Ketik '-1' -> Urutkan Resep")
+	fmt.Println("Ketik '-2' -> Kembali ke Menu Utama")
+	fmt.Println("=================")
+	fmt.Print("Pilihan Anda : ")
 	fmt.Scan(&pilih)
 
-	if pilih == 0 {
+	if pilih == -2 {
 		return
+	}
+
+	if pilih == -1 {
+		var opsi int
+		fmt.Println("===========================")
+		fmt.Println("      URUTKAN RESEP        ")
+		fmt.Println("===========================")
+		fmt.Println("0. Kembali ke Menu Sebelumnya")
+		fmt.Println("1. Berdasarkan Durasi Masak (Tercepat) - Selection Sort")
+		fmt.Println("2. Berdasarkan Judul Resep (A-Z) - Insertion Sort")
+		fmt.Println("===========================")
+		fmt.Print("Pilih (0-2): ")
+		fmt.Scan(&opsi)
+
+		if opsi == 0 {
+			lihat(data)
+			return
+		}
+
+		if opsi == 1 {
+			// Selection Sort berdasarkan durasi (ascending)
+			for i := 0; i < len(data)-1; i++ {
+				n := i
+				for j := i + 1; j < len(data); j++ {
+					if data[j].duration < data[n].duration {
+						n = j
+					}
+				}
+				if n != i {
+					data[i], data[n] = data[n], data[i]
+				}
+			}
+			fmt.Println()
+			fmt.Println("--- Resep berhasil diurutkan berdasarkan Durasi (Tercepat) ---")
+			fmt.Println()
+		} else if opsi == 2 {
+			// Insertion Sort berdasarkan judul (A-Z)
+			for i := 1; i < len(data); i++ {
+				r := data[i]
+				j := i - 1
+				for j >= 0 && data[j].title > r.title {
+					data[j+1] = data[j]
+					j--
+				}
+				data[j+1] = r
+			}
+			fmt.Println()
+			fmt.Println("--- Resep berhasil diurutkan berdasarkan Judul (A-Z) ---")
+			fmt.Println()
+		} else {
+			fmt.Println("Pilihan tidak valid!")
+		}
+
+		lihat(data)
+		return
+	}
+
+	if pilih == 0 {
+		var menu int
+		var kata string
+		fmt.Println("-------------------------")
+		fmt.Println("    METODE PENCARIAN     ")
+		fmt.Println("-------------------------")
+		fmt.Println("0. Kembali ke Menu Sebelumnya")
+		fmt.Println("1. Cari Bahan Utama (Binary Search)")
+		fmt.Println("2. Cari Bahan Utama (Sequential Search)")
+		fmt.Println("-------------------------")
+		fmt.Print("Pilih (0-2): ")
+		fmt.Scan(&menu)
+
+		if menu == 0 {
+			lihat(data)
+			return
+		}
+
+		if menu < 1 || menu > 2 {
+			fmt.Println("Pilihan tidak valid!")
+			lihat(data)
+			return
+		}
+
+		fmt.Print("Masukkan Bahan Utama: ")
+		fmt.Scan(&kata)
+
+		var ketemu int = -1
+
+		if menu == 1 {
+			for i := 0; i < len(data)-1; i++ {
+				for j := i + 1; j < len(data); j++ {
+					if data[i].bahan[0] > data[j].bahan[0] {
+						data[i], data[j] = data[j], data[i]
+					}
+				}
+			}
+
+			var low int = 0
+			var high int = len(data) - 1
+			for low <= high && ketemu == -1 {
+				var mid int = (low + high) / 2
+				if data[mid].bahan[0] == kata {
+					ketemu = mid
+				} else if data[mid].bahan[0] < kata {
+					low = mid + 1
+				} else {
+					high = mid - 1
+				}
+			}
+		} else if menu == 2 {
+			for i := 0; i < len(data); i++ {
+				if data[i].bahan[0] == kata {
+					ketemu = i
+					break
+				}
+			}
+		}
+
+		if ketemu == -1 {
+			fmt.Println("-------------------------")
+			fmt.Println("Resep tidak ditemukan!")
+			fmt.Println("-------------------------")
+			lihat(data)
+			return
+		}
+
+		pilih = ketemu + 1
 	}
 
 	if pilih < 1 || pilih > len(data) {
@@ -108,18 +244,18 @@ func lihat(data []Resep){
 	}
 
 	fmt.Println("#####################")
-	fmt.Print("    ",)
+	fmt.Print("    ")
 	tampilkanTeks(data[pilih-1].title)
 	fmt.Println("        ")
 	fmt.Println("#####################")
 	fmt.Println("Bahan : ")
-	for i := 0; i < data[pilih-1].nBahan; i++{
+	for i := 0; i < data[pilih-1].nBahan; i++ {
 		fmt.Printf("%d. ", i+1)
 		tampilkanTeks(data[pilih-1].bahan[i])
 		fmt.Println()
 		fmt.Println()
 	}
-	
+
 	fmt.Println("Langkah :")
 	for i := 0; i < data[pilih-1].nSteps; i++ {
 		fmt.Printf("%d. ", i+1)
@@ -135,18 +271,16 @@ func lihat(data []Resep){
 
 	fmt.Println()
 	fmt.Println("----------------------------")
-	fmt.Print("Ketik 'back' untuk kembali :")
+	fmt.Print("Ketik 'back' untuk kembali : ")
 	fmt.Scan(&confirm)
-	confirm = strings.ToUpper(confirm)
 	fmt.Println("----------------------------")
-	if confirm == "BACK" {
+	if confirm == "back" || confirm == "BACK" || confirm == "Back" {
 		lihat(data)
 	}
 
 }
 
-
-func ubah(data []Resep) []Resep{
+func ubah(data []Resep) []Resep {
 	var pilih, memilih int
 	var confirm string
 
@@ -169,7 +303,7 @@ func ubah(data []Resep) []Resep{
 	fmt.Print("Pilih Resep yang Ingin Diubah(1-", len(data), ") atau pilih '0' untuk kembali : ")
 	fmt.Scan(&pilih)
 
-	if pilih == 0{
+	if pilih == 0 {
 		return data
 	}
 
@@ -178,7 +312,6 @@ func ubah(data []Resep) []Resep{
 		return data
 	}
 
-
 	fmt.Println("#####################")
 	fmt.Print("    ")
 	tampilkanTeks(data[pilih-1].title)
@@ -186,33 +319,39 @@ func ubah(data []Resep) []Resep{
 	fmt.Println("#####################")
 	fmt.Print("Apakah Kamu Ingin Mengubah Judul(y/n) : ")
 	fmt.Scan(&confirm)
-	if confirm == "Y" || confirm == "y"{
+	if confirm == "Y" || confirm == "y" {
 		fmt.Print("Judul Baru : ")
 		fmt.Scan(&data[pilih-1].title)
 	}
 
 	fmt.Print("Apakah Kamu Ingin Mengubah Bahan(y/n) : ")
 	fmt.Scan(&confirm)
-	if confirm == "Y" || confirm == "y"{
+	if confirm == "Y" || confirm == "y" {
 		fmt.Println("Bahan :")
-		for{
+		for {
 			for i := 0; i < data[pilih-1].nBahan; i++ {
-			fmt.Printf("%d. ", i+1)
-			tampilkanTeks(data[pilih-1].bahan[i])
-			fmt.Println()
+				fmt.Printf("%d. ", i+1)
+				tampilkanTeks(data[pilih-1].bahan[i])
+				fmt.Println()
 			}
 			fmt.Print("Bahan Nomor Berapa yang Ingin Diubah(1-", data[pilih-1].nBahan, ") atau Ketik '0' untuk Menambah Bahan : ")
 			fmt.Scan(&memilih)
 			fmt.Println("-------------------------")
 
 			if memilih == 0 {
-				...
-
-
-			}else if != 0 {
+				if data[pilih-1].nBahan >= 50 {
+					fmt.Println("Bahan sudah penuh (maksimal 50)!")
+				} else {
+					fmt.Print("Masukkan Bahan Baru: ")
+					fmt.Scan(&data[pilih-1].bahan[data[pilih-1].nBahan])
+					data[pilih-1].nBahan++
+					fmt.Print("Masih Ingin Ubah/Tambah Bahan(y/n) : ")
+					fmt.Scan(&confirm)
+				}
+			} else {
 				if memilih < 1 || memilih > data[pilih-1].nBahan {
-				fmt.Println("Nomor bahan tidak valid!")
-				continue
+					fmt.Println("Nomor bahan tidak valid!")
+					continue
 				}
 
 				fmt.Print("Ubah ", data[pilih-1].bahan[memilih-1], " Jadi : ")
@@ -221,18 +360,18 @@ func ubah(data []Resep) []Resep{
 				fmt.Scan(&confirm)
 			}
 
-			if confirm == "n" || confirm == "N"{
+			if confirm == "n" || confirm == "N" {
 				break
 			}
 		}
-		
+
 	}
 
 	fmt.Print("Apakah Kamu Ingin Mengubah Steps Pembuatan(y/n) : ")
 	fmt.Scan(&confirm)
-	if confirm == "y" || confirm == "Y"{
+	if confirm == "y" || confirm == "Y" {
 		fmt.Println("Langkah :")
-		for{
+		for {
 			for i := 0; i < data[pilih-1].nSteps; i++ {
 				fmt.Printf("%d. ", i+1)
 				tampilkanTeks(data[pilih-1].steps[i])
@@ -245,7 +384,7 @@ func ubah(data []Resep) []Resep{
 			fmt.Scan(&data[pilih-1].steps[memilih-1])
 			fmt.Print("Masih Ingin Ubah Steps(y/n) : ")
 			fmt.Scan(&confirm)
-			if confirm == "n" || confirm == "N"{
+			if confirm == "n" || confirm == "N" {
 				break
 			}
 		}
@@ -253,14 +392,14 @@ func ubah(data []Resep) []Resep{
 
 	fmt.Print("Apakah Kamu Ingin Mengubah Kategori(y/n) : ")
 	fmt.Scan(&confirm)
-	if confirm == "Y" || confirm == "y"{
+	if confirm == "Y" || confirm == "y" {
 		fmt.Print("Kategori Baru : ")
 		fmt.Scan(&data[pilih-1].kategori)
 	}
 
 	fmt.Print("Apakah Kamu Ingin Mengubah Durasi(y/n) : ")
 	fmt.Scan(&confirm)
-	if confirm == "Y" || confirm == "y"{
+	if confirm == "Y" || confirm == "y" {
 		fmt.Print("Durasi Baru : ")
 		fmt.Scan(&data[pilih-1].duration)
 	}
@@ -268,16 +407,7 @@ func ubah(data []Resep) []Resep{
 	return data
 }
 
-
 // func hapus(data []Resep) []Resep{
-
-// }
-
-// func cari(data []Resep){
-
-// }
-
-// func urut(data []Resep){
 
 // }
 
@@ -285,14 +415,11 @@ func ubah(data []Resep) []Resep{
 
 // }
 
-
-
-func main(){
+func main() {
 	var pilih int
 	var data []Resep
 
-
-	for{
+	for {
 		fmt.Println("==================")
 		fmt.Println("      RESEPKU     ")
 		fmt.Println("==================")
@@ -300,43 +427,34 @@ func main(){
 		fmt.Println("2. Tambah Resep")
 		fmt.Println("3. Ubah Resep")
 		fmt.Println("4. Hapus Resep")
-		fmt.Println("5. Cari Resep")
-		fmt.Println("6. Urutkan Resep")
-		fmt.Println("7. Statistik")
-		fmt.Println("8. Keluar")
+		fmt.Println("5. Statistik")
+		fmt.Println("6. Keluar")
 		fmt.Println("==================")
-		fmt.Print("Pilih(1-8): ")
+		fmt.Print("Pilih(1-6): ")
 		fmt.Scan(&pilih)
 
-		if pilih < 1 || pilih > 8 {
+		if pilih < 1 || pilih > 6 {
 			fmt.Println("Pilihan tidak valid!")
 			continue
 		}
 
-		if pilih == 8 {
+		if pilih == 6 {
 			break
-		}	
+		}
 
-
-		if pilih == 1{
+		if pilih == 1 {
 			lihat(data)
-		}else if pilih == 2{
+		} else if pilih == 2 {
 			data = tambah(data)
-		}else if pilih == 3{
+		} else if pilih == 3 {
 			data = ubah(data)
 		}
 		// else if pilih == 4{
 
 		// }else if pilih == 5{
 
-		// }else if pilih == 6 {
-			
-		// }else if pilih == 7{
-
 		// }
 
-
 	}
-
 
 }
