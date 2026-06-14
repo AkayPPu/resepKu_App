@@ -26,6 +26,30 @@ func tampilkanTeks(teks string) {
 	}
 }
 
+func hurufKecil(kata string) string {
+	var hasil string
+	for i := 0; i < len(kata); i++ {
+		if kata[i] >= 'A' && kata[i] <= 'Z' {
+			hasil += string(kata[i] + 32)
+		} else {
+			hasil += string(kata[i])
+		}
+	}
+	return hasil
+}
+
+func cekAwal(kata, awal string) bool {
+	if len(kata) < len(awal) {
+		return false
+	}
+	for i := 0; i < len(awal); i++ {
+		if kata[i] != awal[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func tambah(data []Resep) []Resep {
 	var r Resep
 
@@ -195,10 +219,12 @@ func lihat(data []Resep) {
 
 		var daftarHasil []int
 
+		kataLower := hurufKecil(kata)
+
 		if menu == 1 {
 			for i := 0; i < len(data)-1; i++ {
 				for j := i + 1; j < len(data); j++ {
-					if data[i].bahan[0] > data[j].bahan[0] {
+					if hurufKecil(data[i].bahan[0]) > hurufKecil(data[j].bahan[0]) {
 						data[i], data[j] = data[j], data[i]
 					}
 				}
@@ -209,9 +235,10 @@ func lihat(data []Resep) {
 			var ketemu int = -1
 			for low <= high && ketemu == -1 {
 				var mid int = (low + high) / 2
-				if data[mid].bahan[0] == kata {
+				bahanMid := hurufKecil(data[mid].bahan[0])
+				if cekAwal(bahanMid, kataLower) {
 					ketemu = mid
-				} else if data[mid].bahan[0] < kata {
+				} else if bahanMid < kataLower {
 					low = mid + 1
 				} else {
 					high = mid - 1
@@ -220,13 +247,13 @@ func lihat(data []Resep) {
 
 			if ketemu != -1 {
 				left := ketemu
-				for left >= 0 && data[left].bahan[0] == kata {
+				for left >= 0 && cekAwal(hurufKecil(data[left].bahan[0]), kataLower) {
 					left--
 				}
 				left++
 
 				right := ketemu
-				for right < len(data) && data[right].bahan[0] == kata {
+				for right < len(data) && cekAwal(hurufKecil(data[right].bahan[0]), kataLower) {
 					right++
 				}
 				right--
@@ -237,7 +264,8 @@ func lihat(data []Resep) {
 			}
 		} else if menu == 2 {
 			for i := 0; i < len(data); i++ {
-				if data[i].bahan[0] == kata {
+				bahanLower := hurufKecil(data[i].bahan[0])
+				if cekAwal(bahanLower, kataLower) {
 					daftarHasil = append(daftarHasil, i)
 				}
 			}
