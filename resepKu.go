@@ -11,9 +11,9 @@ type Resep struct {
 	nSteps int
 	steps  [50]string
 
-	kategori    string
-	duration    int
-	searchCount int
+	kategori        string
+	duration        int
+	jumlahPencarian int
 }
 
 func tampilkanTeks(teks string) {
@@ -60,7 +60,7 @@ func tambah(data []Resep) []Resep {
 	fmt.Print("Durasi (menit) : ")
 	fmt.Scan(&r.duration)
 
-	r.searchCount = 0
+	r.jumlahPencarian = 0
 
 	data = append(data, r)
 
@@ -195,7 +195,8 @@ func lihat(data []Resep) {
 		fmt.Print("Masukkan Bahan Utama: ")
 		fmt.Scan(&kata)
 
-		var ketemu int = -1
+		var daftarHasil [50]int
+		var jumlahHasil int
 
 		if menu == 1 {
 			for i := 0; i < len(data)-1; i++ {
@@ -208,10 +209,22 @@ func lihat(data []Resep) {
 
 			var low int = 0
 			var high int = len(data) - 1
-			for low <= high && ketemu == -1 {
+			for low <= high {
 				var mid int = (low + high) / 2
 				if data[mid].bahan[0] == kata {
-					ketemu = mid
+					var left = mid
+					for left >= 0 && data[left].bahan[0] == kata {
+						left--
+					}
+					var right = mid
+					for right < len(data) && data[right].bahan[0] == kata {
+						right++
+					}
+					for k := left + 1; k < right; k++ {
+						daftarHasil[jumlahHasil] = k
+						jumlahHasil++
+					}
+					break
 				} else if data[mid].bahan[0] < kata {
 					low = mid + 1
 				} else {
@@ -221,13 +234,13 @@ func lihat(data []Resep) {
 		} else if menu == 2 {
 			for i := 0; i < len(data); i++ {
 				if data[i].bahan[0] == kata {
-					ketemu = i
-					break
+					daftarHasil[jumlahHasil] = i
+					jumlahHasil++
 				}
 			}
 		}
 
-		if ketemu == -1 {
+		if jumlahHasil == 0 {
 			fmt.Println("-------------------------")
 			fmt.Println("Resep tidak ditemukan!")
 			fmt.Println("-------------------------")
@@ -235,7 +248,30 @@ func lihat(data []Resep) {
 			return
 		}
 
-		pilih = ketemu + 1
+		fmt.Println("----------------------------")
+		fmt.Printf("SEMUA RESEP TERKAIT KATA '%s'\n", kata)
+		fmt.Println("-----------------------------")
+		for i := 0; i < jumlahHasil; i++ {
+			fmt.Printf("%d. ", i+1)
+			tampilkanTeks(data[daftarHasil[i]].title)
+			fmt.Println()
+		}
+		fmt.Println("-------------------------------")
+		fmt.Printf("Pilih nomor resep (1-%d) untuk membuka resep atau ketik '0' untuk kembali ke halaman utama.\n", jumlahHasil)
+		fmt.Print("Pilihan Anda : ")
+		var pilihDetail int
+		fmt.Scan(&pilihDetail)
+
+		if pilihDetail == 0 {
+			return
+		} else if pilihDetail > 0 && pilihDetail <= jumlahHasil {
+			pilih = daftarHasil[pilihDetail-1] + 1
+			data[pilih-1].jumlahPencarian++
+		} else {
+			fmt.Println("Pilihan tidak valid!")
+			lihat(data)
+			return
+		}
 	}
 
 	if pilih < 1 || pilih > len(data) {
@@ -271,7 +307,7 @@ func lihat(data []Resep) {
 
 	fmt.Println()
 	fmt.Println("----------------------------")
-	fmt.Print("Ketik 'back' untuk kembali : ")
+	fmt.Print("Ketik 'Back' untuk kembali : ")
 	fmt.Scan(&confirm)
 	fmt.Println("----------------------------")
 	if confirm == "back" || confirm == "BACK" || confirm == "Back" || confirm == "BAck" || confirm == "BaCK" || confirm == "bACk" || confirm == "bacK" || confirm == "baCk" {
@@ -411,9 +447,109 @@ func ubah(data []Resep) []Resep {
 
 // }
 
-// func statistik(data []Resep){
+func statistik(data []Resep) {
+	fmt.Println("=========================")
+	fmt.Println("       STATISTIK         ")
+	fmt.Println("=========================")
+	fmt.Println()
 
-// }
+	fmt.Printf("Total Resep : %d\n", len(data))
+	fmt.Println()
+
+	if len(data) == 0 {
+		fmt.Println("Belum ada resep.")
+		fmt.Println("=========================")
+		return
+	}
+
+	type KategoriResep struct {
+		nama   string
+		jumlah int
+	}
+	var daftarKategori [50]KategoriResep
+	var jumlahKategori int
+
+	for i := 0; i < len(data); i++ {
+		idx := -1
+		for j := 0; j < jumlahKategori; j++ {
+			if daftarKategori[j].nama == data[i].kategori {
+				idx = j
+				break
+			}
+		}
+		if idx == -1 {
+			daftarKategori[jumlahKategori].nama = data[i].kategori
+			daftarKategori[jumlahKategori].jumlah = 1
+			jumlahKategori++
+		} else {
+			daftarKategori[idx].jumlah++
+		}
+	}
+
+	if jumlahKategori > 0 {
+		maxKategori := daftarKategori[0]
+		minKategori := daftarKategori[0]
+		for i := 1; i < jumlahKategori; i++ {
+			if daftarKategori[i].jumlah > maxKategori.jumlah {
+				maxKategori = daftarKategori[i]
+			}
+			if daftarKategori[i].jumlah < minKategori.jumlah {
+				minKategori = daftarKategori[i]
+			}
+		}
+		fmt.Println("Kategori Terbanyak :")
+		tampilkanTeks(maxKategori.nama)
+		fmt.Printf(" (%d resep)\n\n", maxKategori.jumlah)
+
+		fmt.Println("Kategori Tersedikit :")
+		tampilkanTeks(minKategori.nama)
+		fmt.Printf(" (%d resep)\n\n", minKategori.jumlah)
+	}
+
+	fmt.Println("-------------------------")
+	fmt.Println()
+	fmt.Println("Jumlah Resep per Kategori")
+	fmt.Println()
+	for i := 0; i < jumlahKategori; i++ {
+		tampilkanTeks(daftarKategori[i].nama)
+		fmt.Printf("  : %d\n", daftarKategori[i].jumlah)
+	}
+	fmt.Println()
+
+	fmt.Println("-------------------------")
+	fmt.Println()
+	fmt.Println("Top 5 Pencarian")
+	fmt.Println()
+
+	var daftarIndeks [100]int
+	for i := 0; i < len(data); i++ {
+		daftarIndeks[i] = i
+	}
+
+	for i := 0; i < len(data)-1; i++ {
+		for j := i + 1; j < len(data); j++ {
+			if data[daftarIndeks[i]].jumlahPencarian < data[daftarIndeks[j]].jumlahPencarian {
+				daftarIndeks[i], daftarIndeks[j] = daftarIndeks[j], daftarIndeks[i]
+			}
+		}
+	}
+
+	limit := 5
+	if len(data) < 5 {
+		limit = len(data)
+	}
+	for i := 0; i < limit; i++ {
+		fmt.Printf("%d. ", i+1)
+		tampilkanTeks(data[daftarIndeks[i]].title)
+		fmt.Printf("      (%dx)\n", data[daftarIndeks[i]].jumlahPencarian)
+	}
+	fmt.Println()
+	fmt.Println("=========================")
+
+	var confirm string
+	fmt.Print("Ketik 'Back' untuk kembali : ")
+	fmt.Scan(&confirm)
+}
 
 func main() {
 	var pilih int
@@ -448,12 +584,9 @@ func main() {
 			data = tambah(data)
 		} else if pilih == 3 {
 			data = ubah(data)
+		} else if pilih == 5 {
+			statistik(data)
 		}
-		// else if pilih == 4{
-
-		// }else if pilih == 5{
-
-		// }
 
 	}
 
