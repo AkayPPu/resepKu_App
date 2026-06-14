@@ -96,12 +96,12 @@ func lihat(data []Resep) {
 	for i := 0; i < len(data); i++ {
 		fmt.Print(i+1, ". ")
 		tampilkanTeks(data[i].title)
-		fmt.Printf(" | Durasi: %d menit", data[i].duration)
+		fmt.Printf(" | Durasi : %d menit", data[i].duration)
 		fmt.Println()
 	}
 
 	fmt.Println("=================")
-	fmt.Println("Pilih nomor resep (1-", len(data), ") untuk melihat detail")
+	fmt.Println("Pilih nomor resep (1-",len(data),") untuk melihat detail")
 	fmt.Println("Ketik '0'  -> Cari Resep")
 	fmt.Println("Ketik '-1' -> Urutkan Resep")
 	fmt.Println("Ketik '-2' -> Kembali ke Menu Utama")
@@ -131,7 +131,6 @@ func lihat(data []Resep) {
 		}
 
 		if opsi == 1 {
-			// Selection Sort berdasarkan durasi (ascending)
 			for i := 0; i < len(data)-1; i++ {
 				n := i
 				for j := i + 1; j < len(data); j++ {
@@ -147,7 +146,6 @@ func lihat(data []Resep) {
 			fmt.Println("--- Resep berhasil diurutkan berdasarkan Durasi (Tercepat) ---")
 			fmt.Println()
 		} else if opsi == 2 {
-			// Insertion Sort berdasarkan judul (A-Z)
 			for i := 1; i < len(data); i++ {
 				r := data[i]
 				j := i - 1
@@ -443,10 +441,16 @@ func ubah(data []Resep) []Resep {
 	return data
 }
 
-// func hapus(data []Resep) []Resep{
+func hapus(data []Resep) []Resep {
+	var pilih int
+	var confirm string
 
-// }
+	for {
+		fmt.Println("=================")
+		fmt.Println("   HAPUS RESEP   ")
+		fmt.Println("=================")
 
+<<<<<<< HEAD
 func statistik(data []Resep) {
 	fmt.Println("=========================")
 	fmt.Println("       STATISTIK         ")
@@ -457,11 +461,92 @@ func statistik(data []Resep) {
 	fmt.Println()
 
 	if len(data) == 0 {
+=======
+		if len(data) == 0 {
+			fmt.Println("Belum ada resep.")
+			fmt.Println("=================")
+			fmt.Println("Ketik '0' untuk kembali ke Menu Utama")
+			fmt.Print("Pilihan Anda : ")
+			fmt.Scan(&pilih)
+
+			if pilih == 0 {
+				return data
+			}
+
+			fmt.Println("Pilihan tidak valid!")
+			continue
+		}
+
+		for i := 0; i < len(data); i++ {
+			fmt.Print(i+1, ". ")
+			tampilkanTeks(data[i].title)
+			fmt.Printf(" | Durasi : %d menit", data[i].duration)
+			fmt.Println()
+		}
+
+		fmt.Println("=================")
+		fmt.Print("Resep nomor berapa yang ingin dihapus (1-", len(data), ") atau ketik '0' untuk kembali ke menu utama : ")
+		fmt.Scan(&pilih)
+
+		if pilih == 0 {
+			return data
+		}
+
+		if pilih < 1 || pilih > len(data) {
+			fmt.Println("Nomor resep tidak valid!")
+			continue
+		}
+
+		fmt.Println()
+		fmt.Println("-------------------------")
+		fmt.Print("Yakin ingin menghapus resep '")
+		tampilkanTeks(data[pilih-1].title)
+		fmt.Print("'? (y/n) : ")
+		fmt.Scan(&confirm)
+
+		if confirm == "y" || confirm == "Y" {
+
+			fmt.Print("Resep '")
+			tampilkanTeks(data[pilih-1].title)
+			fmt.Println("' berhasil dihapus!")
+
+			// Geser semua elemen setelahnya ke kiri
+			for i := pilih - 1; i < len(data)-1; i++ {
+				data[i] = data[i+1]
+			}
+
+			// Kurangi panjang slice
+			data = data[:len(data)-1]
+
+			return data
+
+		} else if confirm == "n" || confirm == "N" {
+
+			fmt.Println("Penghapusan dibatalkan.")
+			continue
+
+		} else {
+
+			fmt.Println("Input tidak valid!")
+			fmt.Println("Penghapusan dibatalkan.")
+			continue
+
+		}
+	}
+}
+
+func statistik(data []Resep) {
+	if len(data) == 0 {
+		fmt.Println("=========================")
+		fmt.Println("        STATISTIK")
+		fmt.Println("=========================")
+>>>>>>> 3f2821a78c9e870c79cbb411c803e62bb5a2cda2
 		fmt.Println("Belum ada resep.")
 		fmt.Println("=========================")
 		return
 	}
 
+<<<<<<< HEAD
 	type KategoriResep struct {
 		nama   string
 		jumlah int
@@ -549,6 +634,98 @@ func statistik(data []Resep) {
 	var confirm string
 	fmt.Print("Ketik 'Back' untuk kembali : ")
 	fmt.Scan(&confirm)
+=======
+	var kategori []string
+	var jumlah []int
+
+	for i := 0; i < len(data); i++ {
+		ketemu := -1
+
+		for j := 0; j < len(kategori); j++ {
+			if kategori[j] == data[i].kategori {
+				ketemu = j
+				break
+			}
+		}
+
+		if ketemu != -1 {
+			jumlah[ketemu]++
+		} else {
+			kategori = append(kategori, data[i].kategori)
+			jumlah = append(jumlah, 1)
+		}
+	}
+
+	idxMax := 0
+	idxMin := 0
+
+	for i := 1; i < len(jumlah); i++ {
+		if jumlah[i] > jumlah[idxMax] {
+			idxMax = i
+		}
+
+		if jumlah[i] < jumlah[idxMin] {
+			idxMin = i
+		}
+	}
+
+	top := make([]Resep, len(data))
+	copy(top, data)
+
+	for i := 0; i < len(top)-1; i++ {
+		max := i
+
+		for j := i + 1; j < len(top); j++ {
+			if top[j].searchCount > top[max].searchCount {
+				max = j
+			}
+		}
+
+		top[i], top[max] = top[max], top[i]
+	}
+
+	fmt.Println("=========================")
+	fmt.Println("        STATISTIK")
+	fmt.Println("=========================")
+	fmt.Printf("Total Resep : %d\n", len(data))
+
+	fmt.Println()
+	fmt.Print("Kategori Terbanyak : ")
+	tampilkanTeks(kategori[idxMax])
+	fmt.Printf(" (%d resep)\n", jumlah[idxMax])
+
+	fmt.Print("Kategori Tersedikit : ")
+	tampilkanTeks(kategori[idxMin])
+	fmt.Printf(" (%d resep)\n", jumlah[idxMin])
+
+	fmt.Println()
+	fmt.Println("-------------------------")
+	fmt.Println("Jumlah Resep per Kategori")
+	fmt.Println("-------------------------")
+
+	for i := 0; i < len(kategori); i++ {
+		tampilkanTeks(kategori[i])
+		fmt.Printf(" : %d resep\n", jumlah[i])
+	}
+
+	fmt.Println()
+	fmt.Println("-------------------------")
+	fmt.Println("Top 5 Pencarian")
+	fmt.Println("-------------------------")
+
+	batas := 5
+	if len(top) < 5 {
+		batas = len(top)
+	}
+
+	for i := 0; i < batas; i++ {
+		fmt.Printf("%d. ", i+1)
+		tampilkanTeks(top[i].title)
+		fmt.Printf(" (%dx)\n", top[i].searchCount)
+	}
+
+	fmt.Println("=========================")
+>>>>>>> 3f2821a78c9e870c79cbb411c803e62bb5a2cda2
 }
 
 func main() {
@@ -584,7 +761,13 @@ func main() {
 			data = tambah(data)
 		} else if pilih == 3 {
 			data = ubah(data)
+<<<<<<< HEAD
 		} else if pilih == 5 {
+=======
+		}else if pilih == 4{
+			data = hapus(data)
+		}else if pilih == 5{
+>>>>>>> 3f2821a78c9e870c79cbb411c803e62bb5a2cda2
 			statistik(data)
 		}
 
