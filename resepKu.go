@@ -26,30 +26,6 @@ func tampilkanTeks(teks string) {
 	}
 }
 
-func hurufKecil(kata string) string {
-	var hasil string
-	for i := 0; i < len(kata); i++ {
-		if kata[i] >= 'A' && kata[i] <= 'Z' {
-			hasil += string(kata[i] + 32)
-		} else {
-			hasil += string(kata[i])
-		}
-	}
-	return hasil
-}
-
-func cekAwal(kata, awal string) bool {
-	if len(kata) < len(awal) {
-		return false
-	}
-	for i := 0; i < len(awal); i++ {
-		if kata[i] != awal[i] {
-			return false
-		}
-	}
-	return true
-}
-
 func tambah(data []Resep) []Resep {
 	var r Resep
 
@@ -219,12 +195,10 @@ func lihat(data []Resep) {
 
 		var daftarHasil []int
 
-		kataLower := hurufKecil(kata)
-
 		if menu == 1 {
 			for i := 0; i < len(data)-1; i++ {
 				for j := i + 1; j < len(data); j++ {
-					if hurufKecil(data[i].bahan[0]) > hurufKecil(data[j].bahan[0]) {
+					if data[i].bahan[0] > data[j].bahan[0] {
 						data[i], data[j] = data[j], data[i]
 					}
 				}
@@ -235,10 +209,9 @@ func lihat(data []Resep) {
 			var ketemu int = -1
 			for low <= high && ketemu == -1 {
 				var mid int = (low + high) / 2
-				bahanMid := hurufKecil(data[mid].bahan[0])
-				if cekAwal(bahanMid, kataLower) {
+				if data[mid].bahan[0] == kata {
 					ketemu = mid
-				} else if bahanMid < kataLower {
+				} else if data[mid].bahan[0] < kata {
 					low = mid + 1
 				} else {
 					high = mid - 1
@@ -247,13 +220,13 @@ func lihat(data []Resep) {
 
 			if ketemu != -1 {
 				left := ketemu
-				for left >= 0 && cekAwal(hurufKecil(data[left].bahan[0]), kataLower) {
+				for left >= 0 && data[left].bahan[0] == kata {
 					left--
 				}
 				left++
 
 				right := ketemu
-				for right < len(data) && cekAwal(hurufKecil(data[right].bahan[0]), kataLower) {
+				for right < len(data) && data[right].bahan[0] == kata {
 					right++
 				}
 				right--
@@ -264,8 +237,7 @@ func lihat(data []Resep) {
 			}
 		} else if menu == 2 {
 			for i := 0; i < len(data); i++ {
-				bahanLower := hurufKecil(data[i].bahan[0])
-				if cekAwal(bahanLower, kataLower) {
+				if data[i].bahan[0] == kata {
 					daftarHasil = append(daftarHasil, i)
 				}
 			}
@@ -362,6 +334,16 @@ func ubah(data []Resep) []Resep {
 
 	if len(data) == 0 {
 		fmt.Println("Belum ada resep.")
+		fmt.Println("=================")
+		fmt.Println("Ketik '0' untuk kembali ke Menu Utama")
+		fmt.Print("Pilihan Anda : ")
+		fmt.Scan(&pilih)
+
+		if pilih == 0 {
+			return data
+		}
+
+		fmt.Println("Pilihan tidak valid!")
 		return data
 	}
 
@@ -449,17 +431,37 @@ func ubah(data []Resep) []Resep {
 				tampilkanTeks(data[pilih-1].steps[i])
 				fmt.Println()
 			}
-			fmt.Print("Steps Nomor Berapa yang Ingin Diubah(1-", data[pilih-1].nSteps, ") : ")
+			fmt.Print("Steps Nomor Berapa yang Ingin Diubah(1-", data[pilih-1].nSteps,") atau Ketik '0' untuk Menambah Bahan : ")
 			fmt.Scan(&memilih)
 			fmt.Println("-------------------------")
-			fmt.Print("Ubah ", data[pilih-1].steps[memilih-1], " Jadi : ")
-			fmt.Scan(&data[pilih-1].steps[memilih-1])
-			fmt.Print("Masih Ingin Ubah Steps(y/n) : ")
-			fmt.Scan(&confirm)
+			
+			if memilih == 0 {
+				if data[pilih-1].nSteps >= 50 {
+					fmt.Println("Steps sudah Melewati Batas (maksimal 50)!")
+				} else {
+					fmt.Print("Masukkan Steps Baru: ")
+					fmt.Scan(&data[pilih-1].steps[data[pilih-1].nSteps])
+					data[pilih-1].nSteps++
+					fmt.Print("Masih Ingin Ubah/Tambah Steps(y/n) : ")
+					fmt.Scan(&confirm)
+				}
+			}else {
+				if memilih < 1 || memilih > data[pilih-1].nSteps {
+					fmt.Println("Nomor Steps tidak valid!")
+					continue
+				}
+
+				fmt.Print("Ubah ", data[pilih-1].steps[memilih-1], " Jadi : ")
+				fmt.Scan(&data[pilih-1].steps[memilih-1])
+				fmt.Print("Masih Ingin Ubah Steps(y/n) : ")
+				fmt.Scan(&confirm)
+			}
+
 			if confirm == "n" || confirm == "N" {
 				break
 			}
 		}
+
 	}
 
 	fmt.Print("Apakah Kamu Ingin Mengubah Kategori(y/n) : ")
@@ -560,12 +562,22 @@ func hapus(data []Resep) []Resep {
 }
 
 func statistik(data []Resep) {
+	var pilih int
 	if len(data) == 0 {
 		fmt.Println("=========================")
 		fmt.Println("        STATISTIK")
 		fmt.Println("=========================")
 		fmt.Println("Belum ada resep.")
 		fmt.Println("=========================")
+		fmt.Println("Ketik '0' untuk kembali ke Menu Utama")
+		fmt.Print("Pilihan Anda : ")
+		fmt.Scan(&pilih)
+
+		if pilih == 0 {
+			return
+		}
+
+		fmt.Println("Pilihan tidak valid!")
 		return
 	}
 
