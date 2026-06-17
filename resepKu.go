@@ -615,7 +615,10 @@ func statistik(data []Resep) {
 	}
 
 	topsearch := make([]Resep, len(data))
-	copy(topsearch, data)
+
+	for i := 0; i < len(data); i++ {
+		topsearch[i] = data[i]
+	}
 
 	for i := 0; i < len(topsearch)-1; i++ {
 		max := i
