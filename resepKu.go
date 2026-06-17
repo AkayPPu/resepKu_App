@@ -101,7 +101,7 @@ func lihat(data []Resep) {
 	}
 
 	fmt.Println("=================")
-	fmt.Println("Pilih nomor resep (1-", len(data), ") untuk melihat detail")
+	fmt.Println("Pilih nomor resep (1- ", len(data),") untuk melihat detail")
 	fmt.Println("Ketik '0'  -> Cari Resep")
 	fmt.Println("Ketik '-1' -> Urutkan Resep")
 	fmt.Println("Ketik '-2' -> Kembali ke Menu Utama")
@@ -296,7 +296,6 @@ func lihat(data []Resep) {
 	for i := 0; i < data[pilih-1].nBahan; i++ {
 		fmt.Printf("%d. ", i+1)
 		tampilkanTeks(data[pilih-1].bahan[i])
-		fmt.Println()
 		fmt.Println()
 	}
 
@@ -629,48 +628,60 @@ func statistik(data []Resep) {
 
 		topsearch[i], topsearch[max] = topsearch[max], topsearch[i]
 	}
-
-	fmt.Println("=========================")
-	fmt.Println("        STATISTIK")
-	fmt.Println("=========================")
-	fmt.Printf("Total Resep : %d\n", len(data))
-
-	fmt.Println()
-	fmt.Print("Kategori Terbanyak : ")
-	tampilkanTeks(kategori[idxMax])
-	fmt.Printf(" (%d resep)\n", jumlah[idxMax])
-
-	fmt.Print("Kategori Tersedikit : ")
-	tampilkanTeks(kategori[idxMin])
-	fmt.Printf(" (%d resep)\n", jumlah[idxMin])
-
-	fmt.Println()
-	fmt.Println("-------------------------")
-	fmt.Println("Jumlah Resep per Kategori")
-	fmt.Println("-------------------------")
-
-	for i := 0; i < len(kategori); i++ {
-		tampilkanTeks(kategori[i])
-		fmt.Printf(" : %d resep\n", jumlah[i])
+	for {
+		fmt.Println("=========================")
+		fmt.Println("        STATISTIK")
+		fmt.Println("=========================")
+		fmt.Printf("Total Resep : %d\n", len(data))
+	
+		fmt.Println()
+		fmt.Print("Kategori Terbanyak : ")
+		tampilkanTeks(kategori[idxMax])
+		fmt.Printf(" (%d resep)\n", jumlah[idxMax])
+	
+		fmt.Print("Kategori Tersedikit : ")
+		tampilkanTeks(kategori[idxMin])
+		fmt.Printf(" (%d resep)\n", jumlah[idxMin])
+	
+		fmt.Println()
+		fmt.Println("-------------------------")
+		fmt.Println("Jumlah Resep per Kategori")
+		fmt.Println("-------------------------")
+	
+		for i := 0; i < len(kategori); i++ {
+			tampilkanTeks(kategori[i])
+			fmt.Printf(" : %d resep\n", jumlah[i])
+		}
+	
+		fmt.Println()
+		fmt.Println("-------------------------")
+		fmt.Println("Top 5 Pencarian")
+		fmt.Println("-------------------------")
+	
+		batas := 5
+		if len(topsearch) < 5 {
+			batas = len(topsearch)
+		}
+	
+		for i := 0; i < batas; i++ {
+			fmt.Printf("%d. ", i+1)
+			tampilkanTeks(topsearch[i].title)
+			fmt.Printf(" (%dx)\n", topsearch[i].jumlahPencarian)
+		}
+	
+		fmt.Println("=========================")
+		fmt.Println("Ketik '0' untuk kembali ke Menu Utama")
+		fmt.Print("Pilihan Anda : ")
+		fmt.Scan(&pilih)
+	
+		if pilih == 0 {
+			return
+		}
+	
+		fmt.Println("Pilihan tidak valid!")
+		continue
 	}
 
-	fmt.Println()
-	fmt.Println("-------------------------")
-	fmt.Println("Top 5 Pencarian")
-	fmt.Println("-------------------------")
-
-	batas := 5
-	if len(topsearch) < 5 {
-		batas = len(topsearch)
-	}
-
-	for i := 0; i < batas; i++ {
-		fmt.Printf("%d. ", i+1)
-		tampilkanTeks(topsearch[i].title)
-		fmt.Printf(" (%dx)\n", topsearch[i].jumlahPencarian)
-	}
-
-	fmt.Println("=========================")
 }
 
 func main() {
