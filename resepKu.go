@@ -198,7 +198,7 @@ func lihat(data []Resep) {
 		if menu == 1 {
 			for i := 0; i < len(data)-1; i++ {
 				for j := i + 1; j < len(data); j++ {
-					if data[i].bahan[0] > data[j].bahan[0] {
+					if data[i].kategori > data[j].kategori {
 						data[i], data[j] = data[j], data[i]
 					}
 				}
@@ -209,9 +209,9 @@ func lihat(data []Resep) {
 			var ketemu int = -1
 			for low <= high && ketemu == -1 {
 				var mid int = (low + high) / 2
-				if data[mid].bahan[0] == kata {
+				if data[mid].kategori == kata {
 					ketemu = mid
-				} else if data[mid].bahan[0] < kata {
+				} else if data[mid].kategori < kata {
 					low = mid + 1
 				} else {
 					high = mid - 1
@@ -220,13 +220,13 @@ func lihat(data []Resep) {
 
 			if ketemu != -1 {
 				left := ketemu
-				for left >= 0 && data[left].bahan[0] == kata {
+				for left >= 0 && data[left].kategori == kata {
 					left--
 				}
 				left++
 
 				right := ketemu
-				for right < len(data) && data[right].bahan[0] == kata {
+				for right < len(data) && data[right].kategori == kata {
 					right++
 				}
 				right--
@@ -237,7 +237,7 @@ func lihat(data []Resep) {
 			}
 		} else if menu == 2 {
 			for i := 0; i < len(data); i++ {
-				if data[i].bahan[0] == kata {
+				if data[i].kategori == kata {
 					daftarHasil = append(daftarHasil, i)
 				}
 			}
@@ -431,10 +431,10 @@ func ubah(data []Resep) []Resep {
 				tampilkanTeks(data[pilih-1].steps[i])
 				fmt.Println()
 			}
-			fmt.Print("Steps Nomor Berapa yang Ingin Diubah(1-", data[pilih-1].nSteps,") atau Ketik '0' untuk Menambah Bahan : ")
+			fmt.Print("Steps Nomor Berapa yang Ingin Diubah(1-", data[pilih-1].nSteps, ") atau Ketik '0' untuk Menambah Steps : ")
 			fmt.Scan(&memilih)
 			fmt.Println("-------------------------")
-			
+
 			if memilih == 0 {
 				if data[pilih-1].nSteps >= 50 {
 					fmt.Println("Steps sudah Melewati Batas (maksimal 50)!")
@@ -445,7 +445,7 @@ func ubah(data []Resep) []Resep {
 					fmt.Print("Masih Ingin Ubah/Tambah Steps(y/n) : ")
 					fmt.Scan(&confirm)
 				}
-			}else {
+			} else {
 				if memilih < 1 || memilih > data[pilih-1].nSteps {
 					fmt.Println("Nomor Steps tidak valid!")
 					continue
